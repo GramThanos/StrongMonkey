@@ -2,7 +2,7 @@
 
 # StrongMonkey
 
-A PHP library for interacting with the StrongKey FIDO2 Server
+A PHP library for interacting with the [StrongKey FIDO2](https://github.com/StrongKey/fido2) Server
 
 ![strongmonkey-banner](strongmonkey-banner.png)
 
@@ -39,5 +39,3 @@ This library was developed in collaboration with the Systems Security Laboratory
 This project is under The GNU LGPLv2.1 license.
 
 Copyright (c) 2020 Grammatopoulos Athanasios-Vasileios
-
-*(We may need to change license, this is the one StrongKey FIDO2 server is using)*
