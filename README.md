@@ -35,7 +35,7 @@ die($result);
 
 ---
 ## About
-This library was developed in collaboration with the Systems Security Laboratory at Department of Digital Systems at University of Piraeus.
+This library was developed by [GramThanos](https://www.linkedin.com/in/gramthanos/) in collaboration with the [Systems Security Laboratory](https://ssl.ds.unipi.gr/) at Department of Digital Systems at [University of Piraeus](https://www.unipi.gr/).
 
 ---
 ## License
