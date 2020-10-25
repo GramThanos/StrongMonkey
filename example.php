@@ -6,6 +6,8 @@
  * Example
  */
 
+// Don't validate SSL certificate
+define('STRONGMONKEY_DEBUG', true);
 // Include Library
 include('StrongMonkey.php');
 
