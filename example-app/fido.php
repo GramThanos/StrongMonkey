@@ -180,7 +180,6 @@ if ($action === 'register') {
 				'origin' => 'https://' . $_SERVER['HTTP_HOST']
 			));
 			if ($smk->getError($reply)) {
-				var_dump($smk->getError($reply));
 				json_response(array(
 					'error' => 'Failed to register authenticator.',
 				), 404);
