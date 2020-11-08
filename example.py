@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 #
 # StrongMonkey
 # https://github.com/GramThanos/StrongMonkey
@@ -19,7 +20,6 @@ print("Using StrongMonkey " + StrongMonkey.STRONGMONKEY_VESION);
 
 # StrongKey FIDO info
 FS_URL = 'https://192.168.56.102:8181'
-FS_URL = 'https://gramthanos.ddns.net:8181'
 FS_DID = 1
 FS_PROTOCOL = 'REST' # Only REST is currently supported
 # Authentication using HMAC
