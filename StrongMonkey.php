@@ -82,7 +82,7 @@ class StrongMonkey {
 	 * @return integer|array
 	 */
 	public function preregister ($username, $displayname=null, $options=null, $extensions=null) {
-		// Init paramters
+		// Init parameters
 		if (is_null($displayname)) $displayname = $username;
 		$options = $this->jsonStringPrepare($options, new stdClass);
 		$extensions = $this->jsonStringPrepare($extensions, new stdClass);
@@ -106,7 +106,7 @@ class StrongMonkey {
 	 * @return integer|array
 	 */
 	public function register ($response, $metadata=null) {
-		// Init empty paramters
+		// Init empty parameters
 		$response = $this->jsonStringPrepare($response);
 		$metadata = $this->jsonStringPrepare($metadata, new stdClass);
 
@@ -128,7 +128,7 @@ class StrongMonkey {
 	 * @return integer|array
 	 */
 	public function preauthenticate ($username=null, $options=null, $extensions=null) {
-		// Init empty paramters
+		// Init empty parameters
 		//if (is_null($username)) {
 		//	if (is_null($options)) $options = array();
 		//	$options['Residentkey'] = 'req';
@@ -154,7 +154,7 @@ class StrongMonkey {
 	 * @return integer|array
 	 */
 	public function authenticate ($response, $metadata=null) {
-		// Init empty paramters
+		// Init empty parameters
 		$response = $this->jsonStringPrepare($response);
 		$metadata = $this->jsonStringPrepare($metadata, new stdClass);
 
