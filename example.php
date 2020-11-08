@@ -28,7 +28,7 @@ define('FS_KEYSECRET', '7edd81de1baab6ebcc76ebe3e38f41f4');
 //define('FS_KEYSECRET', 'Abcd1234!');
 
 // Initialize
-$monkey = new StrongMonkey(FS_URL, 1, FS_PROTOCOL, FS_AUTH, FS_KEYID, FS_KEYSECRET);
+$monkey = new StrongMonkey(FS_URL, FS_DID, FS_PROTOCOL, FS_AUTH, FS_KEYID, FS_KEYSECRET);
 
 // Create a ping request
 print("-----------------------------------\n");
