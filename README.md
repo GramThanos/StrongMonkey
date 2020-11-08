@@ -5,20 +5,22 @@
 
 # StrongMonkey
 
-A PHP library for interacting with the [StrongKey FIDO2](https://github.com/StrongKey/fido2) Server
+A PHP & Python library for interacting with the [StrongKey FIDO2](https://github.com/StrongKey/fido2) Server
 
 ![strongmonkey-banner](strongmonkey-banner.png)
 
-*The strong monkey that bullies and steals USB tokens from the strong octopus*
+*The strong monkey that handles USB tokens given by the strong octopus*
 
-• [StrongMonkey Library](StrongMonkey.php) • [StrongMonkey API](docs/library_api.md) • [Example Application Setup Guide](docs/setup_guide.md) •
+• [StrongMonkey PHP library file](StrongMonkey.php) • [StrongMonkey Python library file](StrongMonkey.py) • [StrongMonkey API Documentation](docs/library_api.md) • [Example Application Setup Guide](docs/setup_guide.md) •
 
 ---
 ## Example usage
 
-Download the [StrongMonkey](StrongMonkey.php) library and make a simple PING request to your StrongKey FIDO2 server.
+Download the [StrongMonkey](StrongMonkey.php) PHP library and make a simple PING request to your StrongKey FIDO2 server.
 
 ```php
+// Don't validate SSL certificate
+define('STRONGMONKEY_DEBUG', true);
 // Include the library
 include('StrongMonkey.php');
 // Specify the FIDO server's URL and the authentication method to be used
@@ -29,8 +31,28 @@ $result = $monkey->ping();
 if ($error = $monkey->getError($result)) {
 	die($error . "\n");
 }
-// Print the ping results
+// Print server info
 die($result);
+```
+
+You can also do the same thing using the [StrongMonkey](StrongMonkey.py) Python library.
+
+```python
+# Include Library
+import StrongMonkey
+# Don't validate SSL certificate
+StrongMonkey.STRONGMONKEY_DEBUG = True
+# Specify the FIDO server's URL and the authentication method to be used
+monkey = StrongMonkey.StrongMonkey('https://localhost:8080', 1, 'REST', 'HMAC', '162a5684336fa6e7', '7edd81de1baab6ebcc76ebe3e38f41f4')
+# Send a ping request to the server
+result = monkey.ping()
+# If there is an error print it
+error = monkey.getError(result)
+if (error):
+    print(error)
+else:
+	# Print server info
+	print(result)
 ```
 
 ---
