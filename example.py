@@ -27,9 +27,9 @@ FS_AUTH = 'HMAC'
 FS_KEYID = '162a5684336fa6e7'
 FS_KEYSECRET = '7edd81de1baab6ebcc76ebe3e38f41f4'
 # or Authentication using Password
-FS_AUTH = 'PASSWORD'
-FS_KEYID = 'svcfidouser'
-FS_KEYSECRET = 'Abcd1234!'
+#FS_AUTH = 'PASSWORD'
+#FS_KEYID = 'svcfidouser'
+#FS_KEYSECRET = 'Abcd1234!'
 
 # Initialize
 monkey = StrongMonkey.StrongMonkey(FS_URL, FS_DID, FS_PROTOCOL, FS_AUTH, FS_KEYID, FS_KEYSECRET)
