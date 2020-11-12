@@ -24,5 +24,15 @@
 		<script src="js/jquery.min.js"></script>
 		<script src="js/popper.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
+		
+		<?php
+			if (isset($footer_scripts)) {
+				for ($i=0; $i < count($footer_scripts); $i++) { 
+		?>
+		<script src="<?=$footer_scripts[$i];?>"></script>
+		<?php			
+				}
+			}
+		?>
 	</body>
 </html>

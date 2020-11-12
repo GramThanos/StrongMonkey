@@ -32,6 +32,8 @@ if (isset($_GET['action'])) {
 	$action = 'register';
 } else if (isset($_GET['info'])) {
 	$action = 'info';
+} else if (isset($_GET['qrcode'])) {
+	$action = 'qrcode';
 }
 
 /* Authenticate User
@@ -46,7 +48,7 @@ if ($action === 'authenticate') {
 
 	// If this was a post
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-		# If user id, then create a challenge
+		// If user id, then create a challenge
 		if (isset($_POST['userid'])) {
 			// Try to find the user and authenticate him
 			$user = null;
@@ -235,6 +237,183 @@ if ($action === 'info') {
 			json_response(array(
 				'success' => 'Credentials were updated.'
 			), 200);
+		}
+	}
+}
+
+/* QR Code
+ *************************/
+if ($action === 'qrcode') {
+	// If not logged in
+	if (session_isLoggedIn()) {
+		json_response(array(
+			'error' => 'Already logged in.',
+		), 400);
+	}
+
+	// If this was a post
+	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+		// (client) If user id, then create a code
+		if (isset($_POST['userid'])) {
+			// Try to find the user and authenticate him
+			$user = null;
+			// In general, we should be able to do requests with no username
+			// but the StrongKey FIDO2 server seems not to support it
+			if (strlen($_POST['userid']) === 0) {
+				json_response(array(
+					'error' => 'No username was given.',
+				), 404);
+			}
+			if (strlen($_POST['userid']) > 0) {
+				if (strpos($_POST['userid'], '@') !== false) {
+					$user = auth_getUserByEmail($_POST['userid']);
+				}
+				else {
+					$user = auth_getUserByUsername($_POST['userid']);
+				}
+				// If user was not found
+				if (!$user) {
+					json_response(array(
+						'error' => 'Account was not found.',
+					), 404);
+				}
+			}
+			// Try to find the user and authenticate him
+			$code = auth_qrcode_create_entry($user['username']);
+			// If failed to create code
+			if (!$code) {
+				json_response(array(
+					'error' => 'Failed to create code.',
+				), 404);
+			}
+			// The new session challenge is the code
+			session_challenge_set($user, 'qr-code@' . $code);
+			// Send back challenge
+			json_response(array(
+				'success' => 'Code created.',
+				'code' => $code
+			), 200);
+		}
+
+		// If code on url
+		if (isset($_GET['code'])) {
+			// Try to find the user and authenticate him
+			$info = auth_qrcode_get_entry($_GET['code']);
+			// If code was not found
+			if (!$info) {
+				json_response(array(
+					'error' => 'Invalid session.',
+				), 404);
+			}
+
+			// (client) If check status send status info
+			if (isset($_GET['status'])) {
+				// Check if status is authenticated
+				if ($info['status'] === 'authenticated') {
+					// Check session
+					$user = session_challenge_get('qr-code@' . $info['code']);
+					// If there is an error
+					if (!($user && $user === $info['username'])) {
+						json_response(array(
+							'error' => 'Invalid session.'
+						), 404);
+					}
+					// Get user
+					$user = auth_getUserByUsername($user);
+					// If user was not found
+					if (!$user) {
+						json_response(array(
+							'error' => 'Account was not found.',
+						), 404);
+					}
+					// Log user in
+					session_logIn($user);
+				}
+				// Send back challenge
+				json_response(array(
+					'success' => 'Challenge started.',
+					'status' => $info['status']
+				), 200);
+			}
+
+			// (authenticator) If challenge, try to authenticate user
+			if (isset($_POST['publicKeyCredential'])) {
+				$authenticator_response = $_POST['publicKeyCredential'];
+				$clientDataJSON = (isset($authenticator_response['response']) && isset($authenticator_response['response']['clientDataJSON'])) ? json_decode(base64_decode($authenticator_response['response']['clientDataJSON'])) : false;
+				if (!$clientDataJSON || !$user = session_challenge_get('qr-challenge@' . $clientDataJSON->challenge)) {
+					json_response(array(
+						'error' => 'Invalid request.',
+					), 404);
+				}
+
+				// Get user
+				$user = auth_getUserByUsername($user);
+				if (!$user) {
+					json_response(array(
+						'error' => 'Invalid request.',
+					), 404);
+				}
+
+				// Authenticate user
+				$smk = new StrongMonkey(APP_FIDO_URL, APP_FIDO_DID, APP_FIDO_PROTOCOL, APP_FIDO_AUTH, APP_FIDO_KEYID, APP_FIDO_KEYSECRET);
+				$reply = $smk->authenticate($authenticator_response, array(
+					'version' => '1.0',
+					'last_used_location' => 'webapp',
+					'username' => $user['username'],
+					'origin' => 'https://' . $_SERVER['HTTP_HOST']
+				));
+				if ($smk->getError($reply)) {
+					session_logOut();
+					json_response(array(
+						'error' => 'Authentication failed.',
+					), 404);
+				}
+				// Authenticate session
+				auth_qrcode_update_entry($info['code'], 'authenticated');
+				session_logOut();
+				// Send back challenge
+				json_response(array(
+					'success' => 'Successful login.'
+				), 200);
+			}
+
+			// (authenticator) Create challenge
+			else {
+				if ($info['status'] != 'pending') {
+					json_response(array(
+						'error' => 'Invalid session state.',
+					), 404);
+				}
+				// Try to find the user and authenticate him
+				$user = auth_getUserByUsername($info['username']);
+				// If user was not found
+				if (!$user) {
+					json_response(array(
+						'error' => 'Account was not found.',
+					), 404);
+				}
+				// Credential Authentication - Initiation phase
+				$smk = new StrongMonkey(APP_FIDO_URL, APP_FIDO_DID, APP_FIDO_PROTOCOL, APP_FIDO_AUTH, APP_FIDO_KEYID, APP_FIDO_KEYSECRET);
+				$reply = $user ? $smk->preauthenticate($user['username']) : $smk->preauthenticate(); // Maybe in the future resident keys are supported (this is why we have the second call without a $username)
+				if ($smk->getError($reply)) {
+					json_response(array(
+						'error' => 'Challenge creating failed.',
+					), 404);
+				}
+				auth_qrcode_update_entry($info['code'], 'challenging');
+				session_challenge_set($user, 'qr-challenge@' . $reply->Response->challenge);
+				// Send back challenge
+				json_response(array(
+					'success' => 'Challenge started.',
+					'options' => $reply->Response,
+					'client' => array(
+						'id' => $info['device_id'],
+						'name' => $info['device_name']
+					)
+				), 200);
+			}
+
 		}
 	}
 }

@@ -47,7 +47,7 @@ if ($conn->connect_errno) {
 	die('Failed to connect to the database as app user');
 }
 
-// Create table
+// Create users table
 $result = $conn2->query('
 	CREATE TABLE IF NOT EXISTS `users` (
 		`id` int NOT NULL AUTO_INCREMENT,
@@ -55,6 +55,24 @@ $result = $conn2->query('
 		`email` varchar(255) NOT NULL,
 		`password_hash` varchar(255) NOT NULL,
 		PRIMARY KEY (`id`)
+	) DEFAULT CHARSET=utf8;
+');
+if (!$result) {
+	die('Failed to create users table.');
+}
+
+// Create qrcode_sessions table
+$result = $conn2->query('DELETE FROM `qrcode_sessions`;');
+$result = $conn2->query('DROP TABLE `qrcode_sessions`;');
+$result = $conn2->query('
+	CREATE TABLE IF NOT EXISTS `qrcode_sessions` (
+		`code` varchar(64) NOT NULL,
+		`username` varchar(32) NOT NULL,
+		`expiration` datetime NOT NULL,
+		`status` varchar(32) NOT NULL,
+		`device_id` varchar(64) NOT NULL,
+		`device_name` varchar(256) NOT NULL,
+		PRIMARY KEY (`code`)
 	) DEFAULT CHARSET=utf8;
 ');
 if (!$result) {
