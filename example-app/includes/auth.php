@@ -87,10 +87,10 @@ function auth_qrcode_get_entry ($code, $status=null) {
 	$conn = auth_getDbConn();
 	if (!$conn) return null;
 	// Delete expired sessions
-	//$stmt = $conn->prepare('DELETE FROM `qrcode_sessions` WHERE expiration < ?');
-	//$date = date('Y-m-d H:i:s');
-	//$stmt->bind_param('s', $date);
-	//$stmt->execute();
+	$stmt = $conn->prepare('DELETE FROM qrcode_sessions WHERE expiration < ?');
+	$date = date('Y-m-d H:i:s', time());
+	$stmt->bind_param('s', $date);
+	$stmt->execute();
 	// Get this session
 	if (!$status) {
 		$stmt = $conn->prepare('SELECT code, username, expiration, status, device_id, device_name FROM qrcode_sessions WHERE code=?');
@@ -105,7 +105,7 @@ function auth_qrcode_get_entry ($code, $status=null) {
 	return $result->fetch_assoc();
 }
 
-// Authenticate QR code entry
+// Update QR code entry
 function auth_qrcode_update_entry ($code, $status) {
 	$conn = auth_getDbConn();
 	if (!$conn) return null;
