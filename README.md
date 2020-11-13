@@ -1,7 +1,7 @@
-![version](https://img.shields.io/badge/StrongMonkey-v0.0.3--beta-green.svg)
+![version](https://img.shields.io/badge/StrongMonkey-v0.0.4--beta-green.svg)
 ![license](https://img.shields.io/github/license/GramThanos/StrongMonkey.svg)
 <!--![downloads](https://img.shields.io/github/downloads/GramThanos/StrongMonkey/total.svg)
-![downloads](https://img.shields.io/github/downloads/GramThanos/StrongMonkey/v0.0.3-beta/total.svg)-->
+![downloads](https://img.shields.io/github/downloads/GramThanos/StrongMonkey/v0.0.4-beta/total.svg)-->
 
 # StrongMonkey
 

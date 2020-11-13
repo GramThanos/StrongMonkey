@@ -1,11 +1,11 @@
 <?php
 /**
- * StrongMonkey v0.0.3-beta
+ * StrongMonkey v0.0.4-beta
  * PHP library for interacting with StrongKey FIDO Server
  * Copyright (c) 2020 Grammatopoulos Athanasios-Vasileios
  */
 
-define('STRONGMONKEY_VESION', 'v0.0.3-beta');
+define('STRONGMONKEY_VESION', 'v0.0.4-beta');
 if (!defined('STRONGMONKEY_DEBUG')) define('STRONGMONKEY_DEBUG', false);
 if (!defined('STRONGMONKEY_CONNECTTIMEOUT')) define('STRONGMONKEY_CONNECTTIMEOUT', 10);
 if (!defined('STRONGMONKEY_TIMEOUT')) define('STRONGMONKEY_TIMEOUT', 30);

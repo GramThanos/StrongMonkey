@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-# StrongMonkey v0.0.3-beta
+# StrongMonkey v0.0.4-beta
 # Python library for interacting with StrongKey FIDO Server
 # Copyright (c) 2020 Grammatopoulos Athanasios-Vasileios
 #
@@ -14,7 +14,7 @@ import datetime
 import requests
 import sys
 
-STRONGMONKEY_VESION = 'v0.0.3-beta';
+STRONGMONKEY_VESION = 'v0.0.4-beta';
 STRONGMONKEY_DEBUG = False;
 STRONGMONKEY_CONNECTTIMEOUT = 10;
 STRONGMONKEY_TIMEOUT = 30;
