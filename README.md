@@ -24,7 +24,7 @@ define('STRONGMONKEY_DEBUG', true);
 // Include the library
 include('StrongMonkey.php');
 // Specify the FIDO server's URL and the authentication method to be used
-$monkey = new StrongMonkey('https://localhost:8080', 1, 'REST', 'HMAC', '162a5684336fa6e7', '7edd81de1baab6ebcc76ebe3e38f41f4');
+$monkey = new StrongMonkey('https://localhost:8181', 1, 'REST', 'HMAC', '162a5684336fa6e7', '7edd81de1baab6ebcc76ebe3e38f41f4');
 // Send a ping request to the server
 $result = $monkey->ping();
 // If there is an error print it
@@ -43,7 +43,7 @@ import StrongMonkey
 # Don't validate SSL certificate
 StrongMonkey.STRONGMONKEY_DEBUG = True
 # Specify the FIDO server's URL and the authentication method to be used
-monkey = StrongMonkey.StrongMonkey('https://localhost:8080', 1, 'REST', 'HMAC', '162a5684336fa6e7', '7edd81de1baab6ebcc76ebe3e38f41f4')
+monkey = StrongMonkey.StrongMonkey('https://localhost:8181', 1, 'REST', 'HMAC', '162a5684336fa6e7', '7edd81de1baab6ebcc76ebe3e38f41f4')
 # Send a ping request to the server
 result = monkey.ping()
 # If there is an error print it
@@ -54,6 +54,21 @@ else:
 	# Print server info
 	print(result)
 ```
+
+---
+## Example App Preview
+Normal login page
+![](example-app/preview/login.png)
+
+FIDO2 login page
+![](example-app/preview/fido2-login.png)
+
+FIDO2 login using registered mobile devices
+![](example-app/preview/fido2-qrcode-authenticate.png)
+
+Page to manage and register keys
+![](example-app/preview/manage-keys.png)
+
 
 ---
 ## About
