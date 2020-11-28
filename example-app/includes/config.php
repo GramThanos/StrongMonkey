@@ -9,7 +9,7 @@
 // App Info
 define('APP_NAME', 'StrongMonkey');
 define('APP_DESCRIPTION', 'PHP library for interacting with StrongKey FIDO Server');
-define('APP_VERSION', 'v0.0.3-beta');
+define('APP_VERSION', 'v0.0.4-beta');
 define('APP_WEBSITE', 'https://github.com/GramThanos/StrongMonkey');
 define('APP_DEBUG', true);
 define('APP_ROOT_PATH', dirname(__DIR__));
