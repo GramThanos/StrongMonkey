@@ -62,11 +62,7 @@ print(json.dumps(result))
 # Create a preauthenticate request
 print("-----------------------------------")
 print("Pre-authenticate request ... ", end='')
-result = monkey.preauthenticate('gramthanos', {
-    "authenticatorSelection" : {
-        "requireResidentKey" : True
-    }
-})
+result = monkey.preauthenticate('gramthanos')
 error = monkey.getError(result)
 if (error):
     print("failed")

@@ -57,11 +57,7 @@ print(json_encode($result, JSON_UNESCAPED_SLASHES) . "\n");
 // Create a preauthenticate request
 print("-----------------------------------\n");
 print("Pre-authenticate request ... ");
-$result = $monkey->preauthenticate('gramthanos', array(
-	"authenticatorSelection" => array(
-		"requireResidentKey" => true
-	)
-));
+$result = $monkey->preauthenticate('gramthanos');
 if ($error = $monkey->getError($result)) {
 	print("failed\n");
 	die("\t" . $error . "\n");
