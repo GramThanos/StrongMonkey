@@ -156,7 +156,7 @@ if ($action === 'register') {
 			// Save challenge code to session
 			session_challenge_set(false, $reply->Response->challenge);
 			// Set rp info
-			$reply->Response->rp->id = $_SERVER['HTTP_HOST'];
+			$reply->Response->rp->id = strtok($_SERVER['HTTP_HOST'], ':');
 			$reply->Response->rp->name = 'StrongMonkey';
 			// Send back challenge
 			json_response(array(
