@@ -39,7 +39,7 @@ print("-----------------------------------")
 print("Ping request ... ", end='')
 result = monkey.ping()
 error = monkey.getError(result)
-if (error):
+if error:
     print("failed")
     print("\t" + error)
     sys.exit(0)

@@ -30,7 +30,7 @@ define('APP_DATABASE_PASSWORD', 'app_user_pass');
 define('APP_DATABASE_NAME', 'strongmonkey_app_db');
 
 // StrongKey FIDO info
-define('APP_FIDO_URL', 'https://192.168.56.102:8181');
+define('APP_FIDO_URL', 'https://127.0.0.1:8181');
 define('APP_FIDO_DID', 1);
 define('APP_FIDO_PROTOCOL', 'REST');
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * StrongMonkey v0.0.4-beta
- * PHP library for interacting with StrongKey FIDO Server
+ * PHP SDK for interacting with FIDO2 Server API v3.0.0
  * Copyright (c) 2020 Grammatopoulos Athanasios-Vasileios
  */
 

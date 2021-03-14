@@ -1,3 +1,22 @@
+# DEMO FIDO2/WebAuthn App
+
+Demo application with FIDO Login using StrongMonkey PHP SDK
+
+---
+# Example App Preview
+Normal login page
+![](demo-app/preview/login.png)
+
+FIDO2 login page
+![](demo-app/preview/fido2-login.png)
+
+FIDO2 login using registered mobile devices
+![](demo-app/preview/fido2-qrcode-authenticate.png)
+
+Page to manage and register keys
+![](demo-app/preview/manage-keys.png)
+
+---
 # Setup example application
 
 ## Prepare WebServer and SQL server
@@ -18,10 +37,10 @@ As you suspected, you should have a working StrongKey FIDO2 server. If you don't
 You should now have:
 - A URL of your FIDO2 server
 - Credentials to authenticate with the FIDO2 server
-	- Username & Password Credentials (PASSWORD method) or
-		- Default username `svcfidouser` & default password `Abcd1234!`
-	- Public ID & secret key Credentials (HMAC method)
-		- Default public ID `162a5684336fa6e7` & default secret key `7edd81de1baab6ebcc76ebe3e38f41f4`
+    - Username & Password Credentials (PASSWORD method) or
+        - Default username `svcfidouser` & default password `Abcd1234!`
+    - Public ID & secret key Credentials (HMAC method)
+        - Default public ID `162a5684336fa6e7` & default secret key `7edd81de1baab6ebcc76ebe3e38f41f4`
 
 Note: Passwords credentials can be created by creating new users on the LDAP server that the FIDO2 server is communicating with while HMAC credentials can be created through the `keymanager.jar` tool.
 ```sh

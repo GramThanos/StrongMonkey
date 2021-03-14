@@ -15,7 +15,7 @@ include('StrongMonkey.php');
 print("Using StrongMonkey " . STRONGMONKEY_VESION . "\n");
 
 // StrongKey FIDO info
-define('FS_URL', 'https://192.168.56.102:8181');
+define('FS_URL', 'https://127.0.0.1:8181');
 define('FS_DID', 1);
 define('FS_PROTOCOL', 'REST'); // Only REST is currently supported
 // Authentication using HMAC

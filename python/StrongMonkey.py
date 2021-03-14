@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #
 # StrongMonkey v0.0.4-beta
-# Python library for interacting with StrongKey FIDO Server
+# Python SDK for interacting with FIDO2 Server API v3.0.0
 # Copyright (c) 2020 Grammatopoulos Athanasios-Vasileios
 #
 

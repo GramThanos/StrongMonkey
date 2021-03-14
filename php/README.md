@@ -1,4 +1,37 @@
-# Library API
+# StrongMonkey PHP SDK
+
+PHP SDK for interacting with FIDO2 Server API v3.0.0
+
+![strongmonkey-banner](../strongmonkey-banner.png)
+
+---
+
+## Example usage
+
+Download the [StrongMonkey](StrongMonkey.php) PHP SDK library and start by checking the status of your FIDO2 server.
+
+```php
+// Don't validate SSL certificate
+define('STRONGMONKEY_DEBUG', true); // Only for development
+// Include the library
+include('StrongMonkey.php');
+// Specify the FIDO server's URL and the authentication method to be used
+$monkey = new StrongMonkey('https://localhost:8181', 1, 'REST', 'HMAC', '162a5684336fa6e7', '7edd81de1baab6ebcc76ebe3e38f41f4');
+// Send a ping request to the server
+$result = $monkey->ping();
+// If there is an error print it
+if ($error = $monkey->getError($result)) {
+    die($error . "\n");
+}
+// Print server info
+die($result);
+```
+
+A simple example with the first relying party calls can be found at [example.php](example.php)
+
+---
+
+## PHP SDK API
 
  - [StrongMonkey Object](#strongmonkey-object) - `$monkey = new StrongMonkey( ... )`;
  - [PreRegister Method](#preregister) - `$monkey->preregister( ... )`;
@@ -12,8 +45,8 @@
  - [JavaScript functions](#javascript-functions)
 
 
-## StrongMonkey Object
-Create a StrongMonkey object which can later be used to communicate with the StrongKey FIDO2 Server
+### StrongMonkey Object
+Create a StrongMonkey object which can later be used to communicate with the FIDO2 Server
 
 ```php
 new StrongMonkey(string $hostport, integer $did, string $protocol, string $authtype, string $keyid, string $keysecret) : StrongMonkey
@@ -38,7 +71,7 @@ Example call using HMAC authentication:
 ```php
 // Prepare Object
 $monkey = new StrongMonkey(
-    'https://fido2.strongkey.unipi.gr:8181', // URL of your StrongKey FIDO2 server
+    'https://fido2.strongkey.unipi.gr:8181', // URL of your FIDO2 server
     1,                                       // Domain ID (usually 1)
     'REST',                                  // Protocol ti use (currently always REST)
     'HMAC',                                  // Authentication method to use
@@ -51,7 +84,7 @@ Example call using PASSWORD authentication:
 ```php
 // Prepare Object
 $monkey = new StrongMonkey(
-    'https://fido2.strongkey.unipi.gr:8181', // URL of your StrongKey FIDO2 server
+    'https://fido2.strongkey.unipi.gr:8181', // URL of your FIDO2 server
     1,                                       // Domain ID (usually 1)
     'REST',                                  // Protocol ti use (currently always REST)
     'PASSWORD',                              // Authentication method to use
@@ -60,7 +93,7 @@ $monkey = new StrongMonkey(
 );
 ```
 
-## Preregister
+### Preregister
 Initialize a key registration challenge with the FIDO server.
 
 ```php
@@ -81,10 +114,31 @@ $monkey->preregister(string $username[, string $displayname = null[, array|strin
 		- ex. `J. Smith` (full name)
 - $options
 	- Object of options
-	- *Not sure what is supported here*
+	- *Options support depend on your FIDO2 server*
 - $extensions
 	- Object of extensions
-	- *Not sure what is supported here*
+	- *Extensions support depend on your FIDO2 server*
+
+Example call and response forward to front-end
+```php
+// Request to start a key registration
+$response = $monkey->preregister($username);
+// Check for errors
+if ($monkey->getError($response)) {
+    die('Failed to start pre-registeration with the FIDO2 server.');
+}
+// Maybe save the challenge on the session so that you can match it when you receive the reply
+$_SESSION['challenge'] = $response->Response->challenge;
+// Prepare object for WebAuthn
+$webauthn = $response->Response;
+// Set your Replay Party info
+$webauthn->rp->id = strtok($_SERVER['HTTP_HOST'], ':'); // Relaying Party ID, a valid domain string that identifies the WebAuthn Relying Party (It should be the webpage domain or a subset of the domain)
+$webauthn->rp->name = 'StrongMonkey'; // Human-palatable identifier for the Relying Party, intended only for display
+// Reply as JSON (assuming that the JavaScript will handle the request through ajax)
+http_response_code(200);
+header('Content-Type: application/json');
+exit(json_encode($webauthn));
+```
 
 Example returned object:
 ```javascript
@@ -126,30 +180,7 @@ Example returned object:
 }
 ```
 
-Example call
-```php
-// Prepare Object
-$monkey = new StrongMonkey( ... ); // Add your parameters
-// Request to start a key registration
-$response = $monkey->preregister($username);
-// Check for errors
-if ($monkey->getError($response)) {
-    die('Failed to start pre-registeration with the FIDO2 server.');
-}
-// Maybe save the challenge on the session so that you can match it when you receive the reply
-$_SESSION['challenge'] = $response->Response->challenge;
-// Prepare object for WebAuthn
-$webauthn = $response->Response;
-// Set your Replay Party info
-$webauthn->rp->id = $_SERVER['HTTP_HOST']; // Relaying Party ID, a valid domain string that identifies the WebAuthn Relying Party (It should be the webpage domain or a subset of the domain)
-$webauthn->rp->name = 'StrongMonkey';      // Human-palatable identifier for the Relying Party, intended only for display
-// Reply as JSON (assuming that the JavaScript will handle the request through ajax)
-http_response_code(200);
-header('Content-Type: application/json');
-exit(json_encode($webauthn));
-```
-
-JavaScript will have to convert the `user.id`, the `challenge` and any `excludeCredentials[i].id` from `base64` to `Uint8Array`. For example, assuming the the JavaScript retrieved the above JSON object on the `options` variable:
+On the client front-end side, if no library for WebAuthn is used, JavaScript will have to convert the `user.id`, the `challenge` and any `excludeCredentials[i].id` from `base64` to `Uint8Array`. For example, assuming the the JavaScript retrieved the above JSON object on the `options` variable:
 ```javascript
 // Convert base64 values to Uint8Array
 options.challenge = tools.base64urlToUint8Array(options.challenge);
@@ -167,11 +198,11 @@ window.navigator.credentials.create({
 });
 ```
 
-The `tools.base64urlToUint8Array` function can be found at the end of this document.
+The `tools.base64urlToUint8Array` function can be found at the bottom of this section.
 
 
 
-## Register
+### Register
 Send register response to the FIDO server.
 
 ```php
@@ -182,13 +213,8 @@ $monkey->register(array|string $response[, array|string $metadata=null]) : integ
 	- Response data from the authenticator
 - $metadata
 	- Additional meta data
-
-Example returned object:
-```javascript
-{
-    "Response" : "Successfully processed registration response"
-}
-```
+	- *Meta data needed depend on your FIDO2 server*
+	- *e.g. StrongKey FIDO2 Server requires an object as shown on the example bellow*
 
 Example call
 ```php
@@ -198,8 +224,6 @@ $clientDataJSON = json_decode(base64_decode($authenticator_response['response'][
 if (!$clientDataJSON || $_SESSION['challenge'] !== $clientDataJSON->challenge) {
     die('Authentication failed due to challenge mismatch.');
 }
-// Prepare Object
-$monkey = new StrongMonkey( ... ); // Add your parameters
 // Request to register Key
 $response = $monkey->register($authenticator_response, array(
     'version' => '1.0',
@@ -215,7 +239,14 @@ if ($monkey->getError($response)) {
 die($response->Response);
 ```
 
-JavaScript will have to convert the `credential.rawId`, the `response.attestationObject` and the `response.clientDataJSON` from `Uint8Array` to `base64` before sending them to the server. For example, here is an example code of how to prepare the authenticator's response:
+Example returned object:
+```javascript
+{
+    "Response" : "Successfully processed registration response"
+}
+```
+
+On the client front-end side, if no library for WebAuthn is used, JavaScript will have to convert the `credential.rawId`, the `response.attestationObject` and the `response.clientDataJSON` from `Uint8Array` to `base64` before sending them to the server. For example, here is an example code of how to prepare the authenticator's response:
 ```javascript
 // Call WebAuthn credentials create
 window.navigator.credentials.create({
@@ -237,9 +268,9 @@ window.navigator.credentials.create({
 });
 ```
 
-The `tools.uint8ArrayToBase64url` function can be found at the end of this document.
+The `tools.uint8ArrayToBase64url` function can be found at the bottom of this section.
 
-## Preauthenticate
+### Preauthenticate
 Initialize a key authentication challenge with the FIDO server.
 
 ```php
@@ -250,10 +281,27 @@ $monkey->preauthenticate(string $username[, array|string $options=null[, array|s
 	- Username of the user
 - $options
 	- Object of options
-	- *Not sure what is supported here*
+	- *Options support depend on your FIDO2 server*
 - $extensions
 	- Object of extensions
-	- *Not sure what is supported here*
+	- *Extensions support depend on your FIDO2 server*
+
+Example call
+```php
+// Request to start an user authentication
+$response = $monkey->preauthenticate($username);
+// Check for errors
+if ($monkey->getError($response)) {
+    die('Failed to start pre-authenticate with the FIDO2 server.');
+}
+// Maybe save the challenge on the session so that you can match it when you receive the reply
+$_SESSION['challenge'] = $response->Response->challenge;
+// Prepare object for WebAuthn
+$webauthn = $response->Response;
+http_response_code(200);
+header('Content-Type: application/json');
+exit(json_encode($webauthn));
+```
 
 Example returned object:
 ```javascript
@@ -271,26 +319,7 @@ Example returned object:
 }
 ```
 
-Example call
-```php
-// Prepare Object
-$monkey = new StrongMonkey( ... ); // Add your parameters
-// Request to start an user authentication
-$response = $monkey->preauthenticate($username);
-// Check for errors
-if ($monkey->getError($response)) {
-    die('Failed to start pre-authenticate with the FIDO2 server.');
-}
-// Maybe save the challenge on the session so that you can match it when you receive the reply
-$_SESSION['challenge'] = $response->Response->challenge;
-// Prepare object for WebAuthn
-$webauthn = $response->Response;
-http_response_code(200);
-header('Content-Type: application/json');
-exit(json_encode($webauthn));
-```
-
-JavaScript will have to convert the the `challenge` and any `allowCredentials[i].id` from `base64` to `Uint8Array`. For example, assuming the the JavaScript retrieved the above JSON object on the `options` variable:
+On the client front-end side, if no library for WebAuthn is used, JavaScript will have to convert the the `challenge` and any `allowCredentials[i].id` from `base64` to `Uint8Array`. For example, assuming the the JavaScript retrieved the above JSON object on the `options` variable:
 ```javascript
 // Convert base64 values to Uint8Array
 options.challenge = tools.base64urlToUint8Array(options.challenge);
@@ -308,9 +337,9 @@ window.navigator.credentials.get({
 })
 ```
 
-The `tools.base64urlToUint8Array` function can be found at the end of this document.
+The `tools.base64urlToUint8Array` function can be found at the bottom of this section.
 
-## Authenticate
+### Authenticate
 Send authenticate response to the FIDO server.
 
 ```php
@@ -321,13 +350,8 @@ $monkey->authenticate(array|string $response[, array|string $metadata=null]) : i
 	- Response data from the authenticator
 - $metadata
 	- Additional meta data
-
-Example returned object:
-```javascript
-{
-    "Response" : ""
-}
-```
+	- *Meta data needed depend on your FIDO2 server*
+	- *e.g. StrongKey FIDO2 Server requires an object as shown on the example bellow*
 
 Example call
 ```php
@@ -338,8 +362,6 @@ if (!$clientDataJSON || $_SESSION['challenge'] !== $clientDataJSON->challenge) {
     die('Authentication failed due to challenge mismatch.');
 }
 // Here you may also want to check if the username provided exists as a user
-// Prepare Object
-$monkey = new StrongMonkey( ... ); // Add your parameters
 // Request to authenticate user
 $response = $monkey->authenticate($authenticator_response, array(
     'version' => '1.0',
@@ -355,7 +377,14 @@ if ($monkey->getError($response)) {
 die($response->Response); // This will be blank
 ```
 
-JavaScript will have to convert the `credential.rawId`, the `response.attestationObject` and the `response.clientDataJSON` from `Uint8Array` to `base64` before sending them to the server. For example, here is an example code of how to prepare the authenticator's response:
+Example returned object:
+```javascript
+{
+    "Response" : ""
+}
+```
+
+On the client front-end side, if no library for WebAuthn is used, JavaScript will have to convert the `credential.rawId`, the `response.attestationObject` and the `response.clientDataJSON` from `Uint8Array` to `base64` before sending them to the server. For example, here is an example code of how to prepare the authenticator's response:
 ```javascript
 // Call WebAuthn credentials get
 window.navigator.credentials.get({
@@ -379,10 +408,9 @@ window.navigator.credentials.get({
 });
 ```
 
-The `tools.uint8ArrayToBase64url` function can be found at the end of this document.
+The `tools.uint8ArrayToBase64url` function can be found at the bottom of this section.
 
-
-## Update key info
+### Update key info
 Update key information.
 
 ```php
@@ -398,17 +426,8 @@ $monkey->updatekeyinfo(string $status, string $modify_location, string $displayn
 - $keyid
 	- Id of the key to change
 
-Example returned object:
-```javascript
-{
-    "Response" : "Successfully updated user registered security key"
-}
-```
-
 Example call
 ```php
-// Prepare Object
-$monkey = new StrongMonkey( ... ); // Add your parameters
 // Request to update Key
 $response = $monkey->updatekeyinfo('Inactive', 'webapp', 'Text Display Name', $keyid);
 // Check for errors
@@ -419,8 +438,14 @@ if ($monkey->getError($response)) {
 $keys = $response->Response;
 ```
 
+Example returned object:
+```javascript
+{
+    "Response" : "Successfully updated user registered security key"
+}
+```
 
-## Get key info
+### Get key info
 Get user's keys information from the FIDO server.
 
 ```php
@@ -429,6 +454,18 @@ $monkey->getkeysinfo(string $username) : integer|array
 
 - $username
 	- Username of the user
+
+Example call
+```php
+// Request to get Keys from user
+$response = $monkey->getkeysinfo($username);
+// Check for errors
+if ($monkey->getError($response)) {
+    die('Failed to get keys from the FIDO2 server.');
+}
+// Retrieve keys from the response
+$keys = $response->Response->keys;
+```
 
 Example returned object:
 ```javascript
@@ -452,21 +489,7 @@ Example returned object:
 }
 ```
 
-Example call
-```php
-// Prepare Object
-$monkey = new StrongMonkey( ... ); // Add your parameters
-// Request to get Keys from user
-$response = $monkey->getkeysinfo($username);
-// Check for errors
-if ($monkey->getError($response)) {
-    die('Failed to get keys from the FIDO2 server.');
-}
-// Retrieve keys from the response
-$keys = $response->Response->keys;
-```
-
-## Deregister
+### Deregister
 Delete user's key information from the FIDO server.
 
 ```php
@@ -476,17 +499,8 @@ $monkey->deregister(string $keyid) : integer|array
 - $keyid
 	- Id of the key to deregister
 
-Example returned object:
-```javascript
-{
-    "Response" : "Successfully deleted user registered security key"
-}
-```
-
 Example call
 ```php
-// Prepare Object
-$monkey = new StrongMonkey( ... ); // Add your parameters
 // Request to delete key
 $response = $monkey->deregister($keyid);
 // Check for errors
@@ -497,11 +511,30 @@ if ($monkey->getError($response)) {
 die($response->Response);
 ```
 
-## Ping
-Send a ping to the FIDO server.
+Example returned object:
+```javascript
+{
+    "Response" : "Successfully deleted user registered security key"
+}
+```
+
+### Ping
+Send a ping to the FIDO server to check if up.
 
 ```php
 $monkey->ping() : boolean|string
+```
+
+Example call
+```php
+// Ping request
+$response = $monkey->ping();
+// Check for errors
+if ($monkey->getError($response)) {
+    die('Failed to ping FIDO2 server.');
+}
+// Print response
+die($response);
 ```
 
 Example return string:
@@ -513,24 +546,10 @@ Up since: Mon Oct 12 06:22:35 UTC 2020
 FIDO Server Domain 1 is alive!"
 ```
 
-Example call
-```php
-// Prepare Object
-$monkey = new StrongMonkey( ... ); // Add your parameters
-// Ping request
-$response = $monkey->ping();
-// Check for errors
-if ($monkey->getError($response)) {
-    die('Failed to ping FIDO2 server.');
-}
-// Print response
-die($response);
-```
 
+# Front-end JavaScript functions
 
-# JavaScript functions
-
-The following functions can be used for the conversion between `base64` and `Uint8Array`
+The following functions can be used for the conversion between `base64` and `Uint8Array` on the front-end
 ```javascript
 // Tools
 const tools = {
