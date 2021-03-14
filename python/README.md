@@ -2,7 +2,7 @@
 
 Python SDK for interacting with FIDO2 Server API v3.0.0
 
-![strongmonkey-banner](../strongmonkey-banner.png)
+![strongmonkey-banner](../strongmonkey.png)
 
 ---
 
