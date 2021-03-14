@@ -15,14 +15,14 @@ SDK for interacting with FIDO2 Server API v3.0.0
 ---
 
 Supported Languages: 
-	- [PHP](php/README.md)
-	- [Python](python/README.md)
+ - [PHP](php/README.md)
+ - [Python](python/README.md)
 
 Compatible Servers:
-	- [StrongKey FIDO2](https://github.com/StrongKey/fido2)
+ - [StrongKey FIDO2](https://github.com/StrongKey/fido2)
 
 Demo Relying Party Application:
-	- [PHP Demo FIDO2/WebAuthn App](php/DEMO-APP.md)
+ - [PHP Demo FIDO2/WebAuthn App](php/DEMO-APP.md)
 
 ---
 
