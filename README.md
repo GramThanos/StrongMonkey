@@ -19,6 +19,7 @@ Supported Languages:
  - [Python](python/README.md)
 
 Compatible Servers:
+ - [StrongBee FIDO2](https://github.com/GramThanos/StrongBee)
  - [StrongKey FIDO2](https://github.com/StrongKey/fido2)
 
 Demo Relying Party Application:
