@@ -20,7 +20,7 @@ Supported Languages:
 
 Compatible Servers:
  - [StrongBee FIDO2](https://github.com/GramThanos/StrongBee)
- - [StrongKey FIDO2](https://github.com/StrongKey/fido2)
+ - [StrongKey FIDO2](https://github.com/StrongKey/fido2) (up to v4.3.0)
 
 Demo Relying Party Application:
  - [PHP Demo FIDO2/WebAuthn App](php/DEMO-APP.md)
