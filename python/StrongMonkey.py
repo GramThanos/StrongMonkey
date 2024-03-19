@@ -1,8 +1,8 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 #
-# StrongMonkey v0.0.4-beta
+# StrongMonkey v0.0.5-beta
 # Python SDK for interacting with FIDO2 Server API v3.0.0
-# Copyright (c) 2020 Grammatopoulos Athanasios-Vasileios
+# Copyright (c) 2022 Grammatopoulos Athanasios-Vasileios
 #
 
 import os
@@ -14,35 +14,35 @@ import datetime
 import requests
 import sys
 
-STRONGMONKEY_VESION = 'v0.0.4-beta';
-STRONGMONKEY_DEBUG = False;
-STRONGMONKEY_CONNECTTIMEOUT = 10;
-STRONGMONKEY_TIMEOUT = 30;
-STRONGMONKEY_USERAGENT = 'StrongMonkey-Agent' + '/' + STRONGMONKEY_VESION;
+STRONGMONKEY_VESION = 'v0.0.5-beta'
+STRONGMONKEY_DEBUG = False
+STRONGMONKEY_CONNECTTIMEOUT = 10
+STRONGMONKEY_TIMEOUT = 30
+STRONGMONKEY_USERAGENT = 'StrongMonkey-Agent' + '/' + STRONGMONKEY_VESION
 
 class StrongMonkey:
 
     # Static variables
-    api_protocol = 'FIDO2_0';
-    api_version = 'SK3_0';
-    api_url_base = '/skfs/rest';
-    version = STRONGMONKEY_VESION;
-    useragent = STRONGMONKEY_USERAGENT;
+    api_protocol = 'FIDO2_0'
+    api_version = 'SK3_0'
+    api_url_base = '/skfs/rest'
+    version = STRONGMONKEY_VESION
+    useragent = STRONGMONKEY_USERAGENT
 
     # ERRORS
-    PARSE_ERROR = 1001;
-    SUBMIT_ERROR = 1002;
-    AUTHENTICATION_FAILED = 1003;
-    RESOURCE_UNAVAILABLE = 1004;
-    UNEXPECTED_ERROR = 1005;
-    UNUSED_ROUTES = 1006;
-    UNKNOWN_ERROR = 1007;
+    PARSE_ERROR = 1001
+    SUBMIT_ERROR = 1002
+    AUTHENTICATION_FAILED = 1003
+    RESOURCE_UNAVAILABLE = 1004
+    UNEXPECTED_ERROR = 1005
+    UNUSED_ROUTES = 1006
+    UNKNOWN_ERROR = 1007
 
     # Authorization Methods
-    AUTHORIZATION_HMAC = 'HMAC';
-    AUTHORIZATION_PASSWORD = 'PASSWORD';
+    AUTHORIZATION_HMAC = 'HMAC'
+    AUTHORIZATION_PASSWORD = 'PASSWORD'
     # Protocol Methods
-    PROTOCOL_REST = 'REST';
+    PROTOCOL_REST = 'REST'
 
 
     def __init__ (self, hostport, did, protocol, authtype, keyid, keysecret):
@@ -74,10 +74,10 @@ class StrongMonkey:
             'displayname' : displayname,
             'options' : options,
             'extensions' : extensions
-        };
+        }
 
         # Make preregister request
-        return self.request(payload, '/preregister');
+        return self.request(payload, '/preregister')
 
     def register (self, response, metadata=None):
         # Init empty parameters
@@ -226,10 +226,10 @@ class StrongMonkey:
             reqOptions['verify'] = False
         ch = requests.post(
             reqOptions['url'],
-            verify = reqOptions['verify'],
-            data = reqOptions['data'],
-            headers = reqOptions['headers'],
-            timeout = reqOptions['timeout']
+            verify=reqOptions['verify'],
+            data=reqOptions['data'],
+            headers=reqOptions['headers'],
+            timeout=reqOptions['timeout']
         )
         response = ch.text
         response_code = ch.status_code
@@ -252,10 +252,10 @@ class StrongMonkey:
                 return StrongMonkey.PARSE_ERROR
         # 400: There was an error in the submitted input.
         if (code == 400):
-            return StrongMonkey.SUBMIT_ERROR;
+            return StrongMonkey.SUBMIT_ERROR
         # 401: The authentication failed.
         if (code == 401):
-            return StrongMonkey.AUTHENTICATION_FAILED;
+            return StrongMonkey.AUTHENTICATION_FAILED
         # 404: The requested resource is unavailable.
         if (code == 404):
             return StrongMonkey.RESOURCE_UNAVAILABLE
@@ -298,7 +298,7 @@ class StrongMonkey:
         ]
         message = "\n".join(message)
         # Generate HMAC
-        digest = hmac.new(bytes.fromhex(self.keysecret), msg = bytes(message , 'latin-1'), digestmod = hashlib.sha256).digest()
+        digest = hmac.new(bytes.fromhex(self.keysecret), msg=bytes(message , 'latin-1'), digestmod=hashlib.sha256).digest()
         # Return header
         return 'HMAC ' + self.keyid + ':' + base64.b64encode(digest).decode()
 
